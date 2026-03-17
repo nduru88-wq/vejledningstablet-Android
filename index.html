@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+  />
+
+  <title>Elevrunder – Instruktionsside</title>
+
+  <!-- PWA -->
+  <meta name="theme-color" content="#1f2c3f" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Elevrunder" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --page-max: 760px;
+      --gap: 8px;
+      --radius: 22px;
+      --shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+      --timer-bg: #1f2c3f;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #d9dee4;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+    }
+
+    .page {
+      width: 100%;
+      max-width: var(--page-max);
+      height: 100dvh;
+      display: grid;
+      grid-template-rows: 27% 20% 33% 20%;
+      gap: var(--gap);
+      padding: var(--gap);
+      overflow: hidden;
+      transition: filter 0.22s ease;
+    }
+
+    .page.blurred {
+      filter: blur(5px);
+    }
+
+    .panel {
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    .timer-panel {
+      background: var(--timer-bg);
+      color: #fff;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 12px;
+      min-height: 0;
+    }
+
+    .timer-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      width: 100%;
+      height: 100%;
+    }
+
+    .timer-title {
+      font-size: clamp(0.9rem, 2.3vw, 1rem);
+      font-weight: 700;
+      line-height: 1;
+      margin: 0;
+      opacity: 0.96;
+    }
+
+    .corner-minute {
+      position: absolute;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 1.4px solid rgba(255,255,255,0.30);
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.92);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.78rem;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.18s ease;
+    }
+
+    .corner-minute.active {
+      border-color: rgba(255,255,255,0.92);
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.14);
+      color: #fff;
+    }
+
+    .corner-1 { top: 12px; left: 12px; }
+    .corner-2 { top: 12px; right: 12px; }
+    .corner-3 { bottom: 12px; left: 12px; }
+    .corner-4 { bottom: 12px; right: 12px; }
+
+    .pie-timer {
+      width: min(28vw, 118px);
+      height: min(28vw, 118px);
+      position: relative;
+      cursor: pointer;
+      user-select: none;
+      touch-action: manipulation;
+      flex: 0 0 auto;
+    }
+
+    .pie-timer svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .pie-bg {
+      fill: rgba(255,255,255,0.16);
+    }
+
+    .pie-slice {
+      fill: #22c55e;
+      transition: fill 0.2s linear;
+    }
+
+    .pie-slice.warning {
+      fill: #ef4444;
+    }
+
+    .pie-center {
+      position: absolute;
+      inset: 18px;
+      border-radius: 50%;
+      background: #f2f2f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pie-time {
+      font-size: clamp(1rem, 3vw, 1.18rem);
+      font-weight: 700;
+      color: #0f1c2f;
+      letter-spacing: 0.4px;
+    }
+
+    .reset-btn {
+      border: none;
+      border-radius: 999px;
+      padding: 6px 12px;
+      min-height: 30px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      background: #f2f2f2;
+      color: #111827;
+      box-shadow: var(--shadow);
+    }
+
+    .hint {
+      font-size: 0.7rem;
+      opacity: 0.88;
+      text-align: center;
+      margin: 0;
+      line-height: 1.1;
+    }
+
+    .section {
+      min-height: 0;
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .orientation {
+      background: #ead046;
+      color: #111;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .challenge {
+      background: #de4a40;
+      color: #fff;
+      justify-content: flex-start;
+    }
+
+    .story {
+      background: #47bb59;
+      color: #111;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .center-block {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 0;
+      height: 100%;
+      width: 100%;
+      gap: 8px;
+    }
+
+    .section-top {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      width: 100%;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(1rem, 4vw, 1.45rem);
+      line-height: 1.02;
+      text-align: center;
+      font-weight: 700;
+      width: 100%;
+    }
+
+    h3 {
+      margin: 0 0 4px 0;
+      font-size: clamp(0.82rem, 2.4vw, 0.95rem);
+      line-height: 1.05;
+      text-align: center;
+      width: 100%;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .read-btn,
+    .desc-btn {
+      border: none;
+      border-radius: 14px;
+      padding: 8px 14px;
+      min-height: 36px;
+      font-size: clamp(0.8rem, 2.2vw, 0.9rem);
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      background: #161b24;
+      color: #fff;
+    }
+
+    .challenge-layout {
+      display: grid;
+      grid-template-rows: auto auto auto 1fr;
+      height: 100%;
+      min-height: 0;
+      align-items: start;
+      gap: 2px;
+    }
+
+    .challenge-layout .section-top {
+      margin-bottom: 2px;
+    }
+
+    .challenge-layout .button-row {
+      margin-bottom: 0;
+    }
+
+    .arrow-wrap {
+      position: relative;
+      height: 18px;
+      margin: 0;
+    }
+
+    .arrow-wrap svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      overflow: visible;
+    }
+
+    .arrow-line {
+      stroke: rgba(255,255,255,0.95);
+      stroke-width: 2.4;
+      stroke-linecap: round;
+      fill: none;
+    }
+
+    .arrow-head {
+      fill: rgba(255,255,255,0.95);
+    }
+
+    .challenge-bottom {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      min-height: 0;
+      align-items: stretch;
+      margin-top: 2px;
+    }
+
+    .sub-card {
+      padding: 6px 6px 8px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.14);
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 2px;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.22);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 999;
+    }
+
+    .overlay.show {
+      display: flex;
+    }
+
+    .modal {
+      width: min(92vw, 560px);
+      max-height: 78dvh;
+      overflow: auto;
+      background: #ffffff;
+      color: #111827;
+      border-radius: 20px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.24);
+      padding: 20px 18px 16px;
+    }
+
+    .modal-title {
+      margin: 0 0 12px 0;
+      font-size: 1.08rem;
+      line-height: 1.2;
+      text-align: center;
+    }
+
+    .modal-text {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    .modal-text p {
+      margin: 0 0 10px 0;
+      text-align: center;
+    }
+
+    .modal-text ul {
+      margin: 8px 0 0 0;
+      padding-left: 22px;
+    }
+
+    .modal-text li {
+      margin: 0 0 10px 0;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: center;
+    }
+
+    .close-btn {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      min-height: 44px;
+      font-size: 0.94rem;
+      font-weight: 700;
+      cursor: pointer;
+      background: #111827;
+      color: #fff;
+    }
+
+    @media (min-width: 700px) {
+      .page {
+        max-width: 720px;
+      }
+
+      .pie-timer {
+        width: 126px;
+        height: 126px;
+      }
+
+      .pie-time {
+        font-size: 1.28rem;
+      }
+
+      .corner-minute {
+        width: 28px;
+        height: 28px;
+        font-size: 0.82rem;
+      }
+
+      .arrow-wrap {
+        height: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="page" class="page">
+
+    <section class="panel timer-panel">
+      <div class="corner-minute corner-1 active" onclick="event.stopPropagation(); selectMinute(1)">1</div>
+      <div class="corner-minute corner-2" onclick="event.stopPropagation(); selectMinute(2)">2</div>
+      <div class="corner-minute corner-3" onclick="event.stopPropagation(); selectMinute(3)">3</div>
+      <div class="corner-minute corner-4" onclick="event.stopPropagation(); selectMinute(4)">4</div>
+
+      <div class="timer-inner">
+        <div class="timer-title">Timer</div>
+
+        <div class="pie-timer" onclick="toggleClockTimer()">
+          <svg viewBox="0 0 200 200" aria-hidden="true">
+            <circle class="pie-bg" cx="100" cy="100" r="92"></circle>
+            <path id="pieSlice" class="pie-slice" d=""></path>
+          </svg>
+          <div class="pie-center">
+            <div id="pieTime" class="pie-time">01:00</div>
+          </div>
+        </div>
+
+        <button class="reset-btn" onclick="resetTimer()">Nulstil</button>
+        <p class="hint">Tryk på uret for at starte eller pause</p>
+      </div>
+    </section>
+
+    <section class="panel section orientation">
+      <div class="center-block">
+        <div class="section-top">
+          <h2>1. Orientering</h2>
+        </div>
+
+        <div class="button-row">
+          <button
+            class="desc-btn"
+            onclick="openOverlay('1. Orientering', '<p>Du har 2 minutter til at orientere om ting i huset, der kan have relevans for dine kollegaer. Start gerne med at beskrive, hvad relevansen er.</p>')"
+          >
+            Beskrivelse
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel section challenge">
+      <div class="challenge-layout">
+        <div class="section-top">
+          <h2>2. Udfordringen</h2>
+        </div>
+
+        <div class="button-row">
+          <button
+            class="desc-btn"
+            onclick="openOverlay('2. Udfordringen', '<ul><li>Start med at fortælle, om du ønsker råd eller vejledning til din udfordring?</li><li>Tryk evt. på &quot;læs mere&quot; under de to veje, for at få en nærmere beskrivelse.</li><li>Hvor meget vurderer du, at udfordringen fylder arbejdsmæssigt/personligt (1-10), hvor 1 er mindst.</li></ul>')"
+          >
+            Beskrivelse
+          </button>
+        </div>
+
+        <div class="arrow-wrap" aria-hidden="true">
+          <svg viewBox="0 0 100 20" preserveAspectRatio="none">
+            <line class="arrow-line" x1="50" y1="1" x2="30" y2="11"></line>
+            <polygon class="arrow-head" points="27,11 33,11 30,17"></polygon>
+
+            <line class="arrow-line" x1="50" y1="1" x2="70" y2="11"></line>
+            <polygon class="arrow-head" points="67,11 73,11 70,17"></polygon>
+          </svg>
+        </div>
+
+        <div class="challenge-bottom">
+          <div class="sub-card">
+            <h3>Råd</h3>
+            <div class="button-row">
+              <button
+                class="read-btn"
+                onclick="openOverlay('Råd', '<ul><li>Du har nu 3 minutter til at fortælle om din udfordring og hvad du har gjort indtil videre (gruppen noterer evt. ned undervejs).</li><li>Vejleder eller gruppen stiller yderligere spørgsmål.</li><li>Gruppen sender evt. tips og råd på mail efterfølgende.</li></ul>')"
+              >
+                Læs mere
+              </button>
+            </div>
+          </div>
+
+          <div class="sub-card">
+            <h3>Vejledning</h3>
+            <div class="button-row">
+              <button
+                class="read-btn"
+                onclick="openOverlay('Vejledning', '<ul><li>Du har nu 3 minutter til at fortælle om din udfordring og hvad du har gjort indtil videre.</li><li>Vejleder eller gruppen stiller yderligere spørgsmål.</li><li>Fokusperson vender nu ryggen til.</li><li>Gruppen fortæller, hvad de hører har virket godt indtil videre.</li><li>Gruppen fortæller om evt. egne erfaringer (perspektiver), og forslag til at løse denne udfordring.</li><li>Fokuspersonen vender sig om mod gruppen, og fortæller nu hvilke ting og hvornår de evt. vil gå videre med dette. (Ting man ikke vil bruge, nævner man ikke).</li></ul>')"
+              >
+                Læs mere
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel section story">
+      <div class="center-block">
+        <div class="section-top">
+          <h2>3. Den gode fortælling</h2>
+        </div>
+
+        <div class="button-row">
+          <button
+            class="desc-btn"
+            onclick="openOverlay('3. Den gode fortælling', '<p>Du har 2 minutter til at fortælle en oplevelse der for nyligt er lykkedes godt i huset, for en ung eller for dig selv arbejdsmæssigt.</p>')"
+          >
+            Beskrivelse
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div id="overlay" class="overlay" onclick="closeOverlay()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <h3 id="modalTitle" class="modal-title">Titel</h3>
+      <div id="modalText" class="modal-text"></div>
+      <div class="modal-actions">
+        <button class="close-btn" onclick="closeOverlay()">Luk</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let audioCtx = null;
+
+    function initAudio() {
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+      } catch (err) {
+        console.log('Audio kunne ikke initialiseres:', err);
+      }
+    }
+
+    function beep(freq = 720, duration = 180, volume = 0.07, delay = 0) {
+      setTimeout(() => {
+        try {
+          initAudio();
+          if (!audioCtx) return;
+
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+
+          osc.type = 'sine';
+          osc.frequency.value = freq;
+
+          gain.gain.setValueAtTime(0, audioCtx.currentTime);
+          gain.gain.linearRampToValueAtTime(volume, audioCtx.currentTime + 0.01);
+          gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duration / 1000);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          osc.start();
+          osc.stop(audioCtx.currentTime + duration / 1000 + 0.02);
+        } catch (err) {
+          console.log('Kunde ikke afspille lyd:', err);
+        }
+      }, delay);
+    }
+
+    function doubleBeep() {
+      beep(720, 180, 0.075, 0);
+      beep(720, 180, 0.075, 240);
+    }
+
+    function tripleBeep() {
+      beep(720, 180, 0.08, 0);
+      beep(720, 180, 0.08, 240);
+      beep(720, 180, 0.08, 480);
+    }
+
+    let totalSeconds = 60;
+    let remainingSeconds = totalSeconds;
+    let timerInterval = null;
+    let running = false;
+    let warningBeepPlayed = false;
+
+    const pieSlice = document.getElementById('pieSlice');
+    const pieTime = document.getElementById('pieTime');
+
+    function formatTime(seconds) {
+      const min = Math.floor(seconds / 60);
+      const sec = seconds % 60;
+      return String(min).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+    }
+
+    function polarToCartesian(cx, cy, r, angleDeg) {
+      const rad = (angleDeg - 90) * Math.PI / 180.0;
+      return {
+        x: cx + (r * Math.cos(rad)),
+        y: cy + (r * Math.sin(rad))
+      };
+    }
+
+    function describePieSlice(cx, cy, r, fraction) {
+      if (fraction <= 0) return '';
+
+      if (fraction >= 0.999999) {
+        return `
+          M ${cx} ${cy}
+          m 0 -${r}
+          a ${r} ${r} 0 1 1 0 ${2 * r}
+          a ${r} ${r} 0 1 1 0 -${2 * r}
+          Z
+        `;
+      }
+
+      const startAngle = 0;
+      const endAngle = -(fraction * 360);
+
+      const start = polarToCartesian(cx, cy, r, startAngle);
+      const end = polarToCartesian(cx, cy, r, endAngle);
+      const largeArcFlag = fraction > 0.5 ? 1 : 0;
+
+      return [
+        `M ${cx} ${cy}`,
+        `L ${start.x} ${start.y}`,
+        `A ${r} ${r} 0 ${largeArcFlag} 0 ${end.x} ${end.y}`,
+        `Z`
+      ].join(' ');
+    }
+
+    function updatePie() {
+      const fraction = remainingSeconds / totalSeconds;
+      pieSlice.setAttribute('d', describePieSlice(100, 100, 92, fraction));
+
+      if (remainingSeconds <= 20 && remainingSeconds > 0) {
+        pieSlice.classList.add('warning');
+      } else {
+        pieSlice.classList.remove('warning');
+      }
+    }
+
+    function updateUI() {
+      pieTime.textContent = formatTime(remainingSeconds);
+      updatePie();
+    }
+
+    function selectMinute(minuteValue) {
+      initAudio();
+
+      if (running) {
+        pauseTimerOnly();
+      }
+
+      totalSeconds = minuteValue * 60;
+      remainingSeconds = totalSeconds;
+      warningBeepPlayed = false;
+
+      document.querySelectorAll('.corner-minute').forEach(el => {
+        el.classList.remove('active');
+      });
+
+      const activeEl = document.querySelector('.corner-' + minuteValue);
+      if (activeEl) activeEl.classList.add('active');
+
+      updateUI();
+    }
+
+    function tick() {
+      if (remainingSeconds <= 0) return;
+
+      remainingSeconds--;
+
+      if (remainingSeconds === 20 && !warningBeepPlayed) {
+        warningBeepPlayed = true;
+        doubleBeep();
+      }
+
+      updateUI();
+
+      if (remainingSeconds === 0) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        running = false;
+        tripleBeep();
+
+        setTimeout(() => {
+          remainingSeconds = totalSeconds;
+          warningBeepPlayed = false;
+          updateUI();
+        }, 2400);
+      }
+    }
+
+    function startTimer() {
+      if (running) return;
+      initAudio();
+      running = true;
+      timerInterval = setInterval(tick, 1000);
+    }
+
+    function pauseTimerOnly() {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      running = false;
+      updateUI();
+    }
+
+    function resetTimer() {
+      initAudio();
+      clearInterval(timerInterval);
+      timerInterval = null;
+      running = false;
+      warningBeepPlayed = false;
+      remainingSeconds = totalSeconds;
+      updateUI();
+    }
+
+    function toggleClockTimer() {
+      initAudio();
+      if (running) {
+        pauseTimerOnly();
+      } else {
+        startTimer();
+      }
+    }
+
+    function openOverlay(title, html) {
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalText').innerHTML = html;
+      document.getElementById('overlay').classList.add('show');
+      document.getElementById('page').classList.add('blurred');
+    }
+
+    function closeOverlay() {
+      document.getElementById('overlay').classList.remove('show');
+      document.getElementById('page').classList.remove('blurred');
+    }
+
+    updateUI();
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(() => console.log('Service worker registreret'))
+          .catch((err) => console.log('Service worker fejl:', err));
+      });
+    }
+  </script>
+</body>
+</html>
