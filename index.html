@@ -31,6 +31,7 @@
       --radius: 22px;
       --shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
       --timer-bg: #1f2c3f;
+      --circle-size: min(30vw, 126px);
     }
 
     html, body {
@@ -76,11 +77,32 @@
       background: var(--timer-bg);
       color: #fff;
       position: relative;
+      min-height: 0;
+      padding: 10px 12px;
       display: flex;
+      align-items: stretch;
+      justify-content: center;
+    }
+
+    .timer-split {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      align-items: stretch;
+      min-height: 0;
+    }
+
+    .timer-left,
+    .timer-right {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 8px 12px;
-      min-height: 0;
+      position: relative;
     }
 
     .timer-inner {
@@ -88,9 +110,11 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 5px;
+      gap: 6px;
       width: 100%;
       height: 100%;
+      position: relative;
+      min-height: 0;
     }
 
     .timer-title {
@@ -99,6 +123,7 @@
       line-height: 1;
       margin: 0;
       opacity: 0.96;
+      text-align: center;
     }
 
     .corner-minute {
@@ -117,6 +142,7 @@
       cursor: pointer;
       user-select: none;
       transition: all 0.18s ease;
+      z-index: 2;
     }
 
     .corner-minute.active {
@@ -126,14 +152,14 @@
       color: #fff;
     }
 
-    .corner-1 { top: 12px; left: 12px; }
-    .corner-2 { top: 12px; right: 12px; }
-    .corner-3 { bottom: 12px; left: 12px; }
-    .corner-4 { bottom: 12px; right: 12px; }
+    .corner-1 { top: 8px; left: 2px; }
+    .corner-2 { top: 8px; right: 2px; }
+    .corner-3 { bottom: 44px; left: 2px; }
+    .corner-4 { bottom: 44px; right: 2px; }
 
     .pie-timer {
-      width: min(28vw, 118px);
-      height: min(28vw, 118px);
+      width: var(--circle-size);
+      height: var(--circle-size);
       position: relative;
       cursor: pointer;
       user-select: none;
@@ -177,6 +203,31 @@
       letter-spacing: 0.4px;
     }
 
+    .selector-circle {
+      width: var(--circle-size);
+      height: var(--circle-size);
+      border-radius: 50%;
+      border: none;
+      background: #f2f2f2;
+      color: #0f1c2f;
+      font-size: clamp(1rem, 3vw, 1.18rem);
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 14px;
+      line-height: 1.12;
+      white-space: normal;
+    }
+
+    .selector-circle.has-result {
+      background: #22c55e;
+      color: #fff;
+    }
+
     .reset-btn {
       border: none;
       border-radius: 999px;
@@ -188,14 +239,6 @@
       background: #f2f2f2;
       color: #111827;
       box-shadow: var(--shadow);
-    }
-
-    .hint {
-      font-size: 0.7rem;
-      opacity: 0.88;
-      text-align: center;
-      margin: 0;
-      line-height: 1.1;
     }
 
     .section {
@@ -216,7 +259,8 @@
     .challenge {
       background: #de4a40;
       color: #fff;
-      justify-content: flex-start;
+      align-items: center;
+      justify-content: center;
     }
 
     .story {
@@ -284,70 +328,8 @@
       color: #fff;
     }
 
-    .challenge-layout {
-      display: grid;
-      grid-template-rows: auto auto auto 1fr;
-      height: 100%;
-      min-height: 0;
-      align-items: start;
-      gap: 2px;
-    }
-
-    .challenge-layout .section-top {
-      margin-bottom: 2px;
-    }
-
-    .challenge-layout .button-row {
-      margin-bottom: 0;
-    }
-
-    .arrow-wrap {
-      position: relative;
-      height: 18px;
-      margin: 0;
-    }
-
-    .arrow-wrap svg {
-      width: 100%;
-      height: 100%;
-      display: block;
-      overflow: visible;
-    }
-
-    .arrow-line {
-      stroke: rgba(255,255,255,0.95);
-      stroke-width: 2.4;
-      stroke-linecap: round;
-      fill: none;
-    }
-
-    .arrow-head {
-      fill: rgba(255,255,255,0.95);
-    }
-
-    .challenge-bottom {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-      min-height: 0;
-      align-items: stretch;
-      margin-top: 2px;
-    }
-
-    .sub-card {
-      padding: 6px 6px 8px;
-      border-radius: 16px;
-      background: rgba(255,255,255,0.14);
-      min-height: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      gap: 2px;
-    }
-
-    .overlay {
+    .overlay,
+    .picker-overlay {
       position: fixed;
       inset: 0;
       background: rgba(15, 23, 42, 0.22);
@@ -360,13 +342,15 @@
       z-index: 999;
     }
 
-    .overlay.show {
+    .overlay.show,
+    .picker-overlay.show {
       display: flex;
     }
 
-    .modal {
-      width: min(92vw, 560px);
-      max-height: 78dvh;
+    .modal,
+    .picker-modal {
+      width: min(94vw, 620px);
+      max-height: 84dvh;
       overflow: auto;
       background: #ffffff;
       color: #111827;
@@ -375,7 +359,8 @@
       padding: 20px 18px 16px;
     }
 
-    .modal-title {
+    .modal-title,
+    .picker-title {
       margin: 0 0 12px 0;
       font-size: 1.08rem;
       line-height: 1.2;
@@ -403,12 +388,18 @@
       margin: 0 0 10px 0;
     }
 
-    .modal-actions {
+    .modal-actions,
+    .picker-actions {
       display: flex;
       justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
-    .close-btn {
+    .close-btn,
+    .picker-btn,
+    .draw-overlay-btn,
+    .remove-pool-btn {
       border: none;
       border-radius: 12px;
       padding: 12px 18px;
@@ -420,17 +411,194 @@
       color: #fff;
     }
 
+    .draw-overlay-btn {
+      background: #22c55e;
+    }
+
+    .draw-overlay-btn:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+    }
+
+    .remove-pool-btn {
+      min-height: 34px;
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      background: #dc2626;
+      border-radius: 10px;
+    }
+
+    .name-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .name-btn {
+      border: 2px solid #cbd5e1;
+      border-radius: 14px;
+      min-height: 46px;
+      background: #f8fafc;
+      color: #0f172a;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 10px 8px;
+      transition: all 0.18s ease;
+    }
+
+    .name-btn.selected {
+      border-color: #22c55e;
+      background: #dcfce7;
+    }
+
+    .name-btn.in-pool {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .slider-wrap {
+      background: #f8fafc;
+      border-radius: 16px;
+      padding: 12px 12px 14px;
+      margin-bottom: 14px;
+    }
+
+    .slider-label {
+      text-align: center;
+      font-size: 0.92rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .slider-value {
+      text-align: center;
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #0f172a;
+    }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .slider-minmax {
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: #475569;
+      width: 16px;
+      text-align: center;
+      flex: 0 0 16px;
+    }
+
+    .need-slider {
+      flex: 1 1 auto;
+      width: 100%;
+    }
+
+    .picker-status {
+      text-align: center;
+      font-size: 0.88rem;
+      min-height: 22px;
+      color: #b91c1c;
+      margin-bottom: 10px;
+    }
+
+    .overlay-pool-box {
+      background: #f8fafc;
+      border-radius: 16px;
+      padding: 12px;
+      margin-bottom: 14px;
+    }
+
+    .overlay-pool-title {
+      margin: 0 0 8px 0;
+      text-align: center;
+      font-size: 0.96rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .overlay-pool-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .overlay-pool-item {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      align-items: center;
+      gap: 10px;
+      background: #e2e8f0;
+      border-radius: 12px;
+      padding: 8px 10px;
+      font-size: 0.9rem;
+      color: #0f172a;
+    }
+
+    .overlay-pool-empty {
+      text-align: center;
+      font-size: 0.88rem;
+      color: #64748b;
+      padding: 10px 4px;
+    }
+
+    .draw-animation-box {
+      background: #eff6ff;
+      border: 2px solid #93c5fd;
+      border-radius: 16px;
+      padding: 12px;
+      margin-top: 8px;
+      display: none;
+    }
+
+    .draw-animation-box.finished {
+      background: #ecfdf5;
+      border-color: #22c55e;
+    }
+
+    .draw-animation-title {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #1d4ed8;
+      margin: 0 0 6px 0;
+      font-weight: 700;
+    }
+
+    .draw-animation-box.finished .draw-animation-title {
+      color: #166534;
+    }
+
+    .draw-animation-name {
+      text-align: center;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #1e3a8a;
+      line-height: 1.1;
+      min-height: 1.5em;
+    }
+
+    .draw-animation-box.finished .draw-animation-name {
+      color: #166534;
+    }
+
     @media (min-width: 700px) {
       .page {
         max-width: 720px;
       }
 
-      .pie-timer {
-        width: 126px;
-        height: 126px;
+      :root {
+        --circle-size: 132px;
       }
 
-      .pie-time {
+      .pie-time,
+      .selector-circle {
         font-size: 1.28rem;
       }
 
@@ -439,10 +607,6 @@
         height: 28px;
         font-size: 0.82rem;
       }
-
-      .arrow-wrap {
-        height: 20px;
-      }
     }
   </style>
 </head>
@@ -450,26 +614,79 @@
   <div id="page" class="page">
 
     <section class="panel timer-panel">
-      <div class="corner-minute corner-1 active" onclick="event.stopPropagation(); selectMinute(1)">1</div>
-      <div class="corner-minute corner-2" onclick="event.stopPropagation(); selectMinute(2)">2</div>
-      <div class="corner-minute corner-3" onclick="event.stopPropagation(); selectMinute(3)">3</div>
-      <div class="corner-minute corner-4" onclick="event.stopPropagation(); selectMinute(4)">4</div>
+      <div class="timer-split">
 
-      <div class="timer-inner">
-        <div class="timer-title">Timer</div>
+        <div class="timer-left">
+          <div class="timer-inner">
+            <div class="corner-minute corner-1 active" onclick="event.stopPropagation(); selectMinute(1)">1</div>
+            <div class="corner-minute corner-2" onclick="event.stopPropagation(); selectMinute(2)">2</div>
+            <div class="corner-minute corner-3" onclick="event.stopPropagation(); selectMinute(3)">3</div>
+            <div class="corner-minute corner-4" onclick="event.stopPropagation(); selectMinute(4)">4</div>
 
-        <div class="pie-timer" onclick="toggleClockTimer()">
-          <svg viewBox="0 0 200 200" aria-hidden="true">
-            <circle class="pie-bg" cx="100" cy="100" r="92"></circle>
-            <path id="pieSlice" class="pie-slice" d=""></path>
-          </svg>
-          <div class="pie-center">
-            <div id="pieTime" class="pie-time">01:00</div>
+            <div class="timer-title">Timer</div>
+
+            <div class="pie-timer" onclick="toggleClockTimer()">
+              <svg viewBox="0 0 200 200" aria-hidden="true">
+                <circle class="pie-bg" cx="100" cy="100" r="92"></circle>
+                <path id="pieSlice" class="pie-slice" d=""></path>
+              </svg>
+              <div class="pie-center">
+                <div id="pieTime" class="pie-time">01:00</div>
+              </div>
+            </div>
+
+            <button class="reset-btn" onclick="resetTimer()">Nulstil</button>
           </div>
         </div>
 
-        <button class="reset-btn" onclick="resetTimer()">Nulstil</button>
-        <p class="hint">Tryk på uret for at starte eller pause</p>
+        <div class="timer-right">
+          <div class="timer-inner">
+            <div class="timer-title">Den vejledte</div>
+
+            <button id="selectorCircle" class="selector-circle" onclick="openPickerOverlay()">
+              Tryk for tilføj
+            </button>
+
+            <button class="reset-btn" onclick="resetSelectionAndPool()">
+              Nulstil
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="panel section challenge">
+      <div class="center-block">
+        <div class="section-top">
+          <h2>2. Udfordringen</h2>
+        </div>
+
+        <div class="button-row">
+          <button
+            class="desc-btn"
+            onclick="openOverlay('2. Udfordringen', '<ul><li>Du har nu 3 minutter til at fortælle om din udfordring og hvad du har forsøgt indtil nu. (hvilke evt. følelser vækker dette i dig?)</li><li>Vejleder eller gruppen stiller &quot;neutrale&quot; opklarende spørgsmål.</li><li><strong>Fokusperson vender nu ryggen til.</strong></li><li>Gruppen fortæller, hvad de har hørt/set har virket godt indtil videre.</li><li>Gruppen fortæller om nye perspektiver, egne erfaringer og løsningsforslag.</li><li><strong>Fokuspersonen vender sig om mod gruppen.</strong></li><li>Fokuspersonen fortæller om evt. nye perspektiver og om eller hvornår de evt. vil afprøve dette.</li><li>Vejledningen er færdig:)</li></ul>')"
+          >
+            Læs mere
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel section story">
+      <div class="center-block">
+        <div class="section-top">
+          <h2>3. Den gode fortælling</h2>
+        </div>
+
+        <div class="button-row">
+          <button
+            class="desc-btn"
+            onclick="openOverlay('3. Den gode fortælling', '<ul><li>I har nu på skift 2 minutter til at fortælle en oplevelse der for nyligt er lykkedes godt i huset, for en ung eller for dig selv arbejdsmæssigt.</li></ul>')"
+          >
+            Læs mere
+          </button>
+        </div>
       </div>
     </section>
 
@@ -484,81 +701,12 @@
             class="desc-btn"
             onclick="openOverlay('1. Orientering', '<p>Du har 2 minutter til at orientere om ting i huset, der kan have relevans for dine kollegaer. Start gerne med at beskrive, hvad relevansen er.</p>')"
           >
-            Beskrivelse
+            Læs mere
           </button>
         </div>
       </div>
     </section>
 
-    <section class="panel section challenge">
-      <div class="challenge-layout">
-        <div class="section-top">
-          <h2>2. Udfordringen</h2>
-        </div>
-
-        <div class="button-row">
-          <button
-            class="desc-btn"
-            onclick="openOverlay('2. Udfordringen', '<ul><li>Start med at fortælle, om du ønsker råd eller vejledning til din udfordring?</li><li>Tryk evt. på &quot;læs mere&quot; under de to veje, for at få en nærmere beskrivelse.</li><li>Hvor meget vurderer du, at udfordringen fylder arbejdsmæssigt/personligt (1-10), hvor 1 er mindst.</li></ul>')"
-          >
-            Beskrivelse
-          </button>
-        </div>
-
-        <div class="arrow-wrap" aria-hidden="true">
-          <svg viewBox="0 0 100 20" preserveAspectRatio="none">
-            <line class="arrow-line" x1="50" y1="1" x2="30" y2="11"></line>
-            <polygon class="arrow-head" points="27,11 33,11 30,17"></polygon>
-
-            <line class="arrow-line" x1="50" y1="1" x2="70" y2="11"></line>
-            <polygon class="arrow-head" points="67,11 73,11 70,17"></polygon>
-          </svg>
-        </div>
-
-        <div class="challenge-bottom">
-          <div class="sub-card">
-            <h3>Råd</h3>
-            <div class="button-row">
-              <button
-                class="read-btn"
-                onclick="openOverlay('Råd', '<ul><li>Du har nu 3 minutter til at fortælle om din udfordring og hvad du har gjort indtil videre (gruppen noterer evt. ned undervejs).</li><li>Vejleder eller gruppen stiller yderligere spørgsmål.</li><li>Gruppen sender evt. tips og råd på mail efterfølgende.</li></ul>')"
-              >
-                Læs mere
-              </button>
-            </div>
-          </div>
-
-          <div class="sub-card">
-            <h3>Vejledning</h3>
-            <div class="button-row">
-              <button
-                class="read-btn"
-                onclick="openOverlay('Vejledning', '<ul><li>Du har nu 3 minutter til at fortælle om din udfordring og hvad du har gjort indtil videre.</li><li>Vejleder eller gruppen stiller yderligere spørgsmål.</li><li>Fokusperson vender nu ryggen til.</li><li>Gruppen fortæller, hvad de hører har virket godt indtil videre.</li><li>Gruppen fortæller om evt. egne erfaringer (perspektiver), og forslag til at løse denne udfordring.</li><li>Fokuspersonen vender sig om mod gruppen, og fortæller nu hvilke ting og hvornår de evt. vil gå videre med dette. (Ting man ikke vil bruge, nævner man ikke).</li></ul>')"
-              >
-                Læs mere
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="panel section story">
-      <div class="center-block">
-        <div class="section-top">
-          <h2>3. Den gode fortælling</h2>
-        </div>
-
-        <div class="button-row">
-          <button
-            class="desc-btn"
-            onclick="openOverlay('3. Den gode fortælling', '<p>Du har 2 minutter til at fortælle en oplevelse der for nyligt er lykkedes godt i huset, for en ung eller for dig selv arbejdsmæssigt.</p>')"
-          >
-            Beskrivelse
-          </button>
-        </div>
-      </div>
-    </section>
   </div>
 
   <div id="overlay" class="overlay" onclick="closeOverlay()">
@@ -567,6 +715,61 @@
       <div id="modalText" class="modal-text"></div>
       <div class="modal-actions">
         <button class="close-btn" onclick="closeOverlay()">Luk</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="pickerOverlay" class="picker-overlay" onclick="closePickerOverlay()">
+    <div class="picker-modal" onclick="event.stopPropagation()">
+      <h3 class="picker-title">Vælg person og behov</h3>
+
+      <div id="nameGrid" class="name-grid"></div>
+
+      <div class="slider-wrap">
+        <div class="slider-label">Hvor meget fylder behovet?</div>
+        <div id="sliderValue" class="slider-value">5</div>
+        <div class="slider-row">
+          <div class="slider-minmax">1</div>
+          <input
+            id="needSlider"
+            class="need-slider"
+            type="range"
+            min="1"
+            max="10"
+            step="1"
+            value="5"
+            oninput="updateSliderValue(this.value)"
+          />
+          <div class="slider-minmax">10</div>
+        </div>
+      </div>
+
+      <div id="pickerStatus" class="picker-status"></div>
+
+      <div class="picker-actions" style="margin-bottom:14px;">
+        <button class="picker-btn" onclick="addSelectedToPool()">Tilføj til pulje</button>
+      </div>
+
+      <div class="overlay-pool-box">
+        <p class="overlay-pool-title">Pulje</p>
+        <div id="overlayPoolList" class="overlay-pool-list"></div>
+
+        <div class="picker-actions">
+          <button id="drawOverlayBtn" class="draw-overlay-btn" onclick="drawSelectedPersonWithAnimation()" disabled>
+            Træk vejledt
+          </button>
+          <button class="picker-btn" onclick="resetPoolOnly()">
+            Nulstil pulje
+          </button>
+          <button class="picker-btn" onclick="closePickerOverlay()">
+            Luk
+          </button>
+        </div>
+
+        <div id="drawAnimationBox" class="draw-animation-box">
+          <p id="drawAnimationTitle" class="draw-animation-title">Udtrækker vejledt...</p>
+          <div id="drawAnimationName" class="draw-animation-name"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -784,7 +987,283 @@
       document.getElementById('page').classList.remove('blurred');
     }
 
+    const participantNames = ['Michael', 'Sanne', 'Bettina', 'Ditte', 'Peter', 'Anja'];
+    let pool = [];
+    let selectedName = null;
+    let drawnPerson = null;
+    let drawAnimationInterval = null;
+    let isDrawing = false;
+
+    const nameGrid = document.getElementById('nameGrid');
+    const needSlider = document.getElementById('needSlider');
+    const sliderValue = document.getElementById('sliderValue');
+    const pickerStatus = document.getElementById('pickerStatus');
+    const selectorCircle = document.getElementById('selectorCircle');
+    const pickerOverlay = document.getElementById('pickerOverlay');
+    const overlayPoolList = document.getElementById('overlayPoolList');
+    const drawOverlayBtn = document.getElementById('drawOverlayBtn');
+    const drawAnimationBox = document.getElementById('drawAnimationBox');
+    const drawAnimationTitle = document.getElementById('drawAnimationTitle');
+    const drawAnimationName = document.getElementById('drawAnimationName');
+
+    function renderNameButtons() {
+      nameGrid.innerHTML = '';
+
+      participantNames.forEach(name => {
+        const btn = document.createElement('button');
+        btn.className = 'name-btn';
+        btn.textContent = name;
+
+        const alreadyInPool = pool.some(p => p.name === name);
+
+        if (selectedName === name) {
+          btn.classList.add('selected');
+        }
+
+        if (alreadyInPool) {
+          btn.classList.add('in-pool');
+          btn.disabled = true;
+        } else {
+          btn.onclick = () => {
+            selectedName = name;
+            pickerStatus.textContent = '';
+            renderNameButtons();
+          };
+        }
+
+        nameGrid.appendChild(btn);
+      });
+    }
+
+    function updateSliderValue(value) {
+      sliderValue.textContent = value;
+    }
+
+    function openPickerOverlay() {
+      pickerOverlay.classList.add('show');
+      document.getElementById('page').classList.add('blurred');
+      selectedName = null;
+      needSlider.value = 5;
+      updateSliderValue(5);
+      pickerStatus.textContent = '';
+      renderNameButtons();
+      renderOverlayPool();
+
+      if (drawnPerson) {
+        drawAnimationBox.style.display = 'block';
+        drawAnimationBox.classList.add('finished');
+        drawAnimationTitle.textContent = 'Vejledt fundet';
+        drawAnimationName.textContent = drawnPerson;
+      } else {
+        drawAnimationBox.style.display = 'none';
+        drawAnimationBox.classList.remove('finished');
+        drawAnimationTitle.textContent = 'Udtrækker vejledt...';
+        drawAnimationName.textContent = '';
+      }
+    }
+
+    function closePickerOverlay() {
+      if (isDrawing) return;
+      pickerOverlay.classList.remove('show');
+      document.getElementById('page').classList.remove('blurred');
+      selectedName = null;
+      pickerStatus.textContent = '';
+    }
+
+    function addSelectedToPool() {
+      if (isDrawing) return;
+
+      if (!selectedName) {
+        pickerStatus.textContent = 'Vælg først en person.';
+        return;
+      }
+
+      const need = Number(needSlider.value);
+
+      if (pool.some(p => p.name === selectedName)) {
+        pickerStatus.textContent = selectedName + ' er allerede i puljen.';
+        return;
+      }
+
+      pool.push({
+        name: selectedName,
+        need: need
+      });
+
+      selectedName = null;
+      needSlider.value = 5;
+      updateSliderValue(5);
+      pickerStatus.textContent = '';
+      drawnPerson = null;
+
+      drawAnimationBox.style.display = 'none';
+      drawAnimationBox.classList.remove('finished');
+      drawAnimationTitle.textContent = 'Udtrækker vejledt...';
+      drawAnimationName.textContent = '';
+
+      renderNameButtons();
+      renderOverlayPool();
+      updateSelectorDisplay();
+    }
+
+    function removeFromPool(nameToRemove) {
+      if (isDrawing) return;
+
+      pool = pool.filter(person => person.name !== nameToRemove);
+
+      if (drawnPerson === nameToRemove) {
+        drawnPerson = null;
+        drawAnimationBox.style.display = 'none';
+        drawAnimationBox.classList.remove('finished');
+        drawAnimationTitle.textContent = 'Udtrækker vejledt...';
+        drawAnimationName.textContent = '';
+      }
+
+      renderNameButtons();
+      renderOverlayPool();
+      updateSelectorDisplay();
+    }
+
+    function renderOverlayPool() {
+      overlayPoolList.innerHTML = '';
+
+      if (pool.length === 0) {
+        overlayPoolList.innerHTML = '<div class="overlay-pool-empty">Ingen i puljen endnu</div>';
+      } else {
+        pool.forEach(person => {
+          const item = document.createElement('div');
+          item.className = 'overlay-pool-item';
+
+          const nameEl = document.createElement('span');
+          nameEl.textContent = person.name;
+
+          const needEl = document.createElement('span');
+          needEl.textContent = 'Behov ' + person.need;
+
+          const removeBtn = document.createElement('button');
+          removeBtn.className = 'remove-pool-btn';
+          removeBtn.textContent = 'Fjern';
+          removeBtn.onclick = () => removeFromPool(person.name);
+
+          item.appendChild(nameEl);
+          item.appendChild(needEl);
+          item.appendChild(removeBtn);
+
+          overlayPoolList.appendChild(item);
+        });
+      }
+
+      drawOverlayBtn.disabled = pool.length === 0 || isDrawing;
+    }
+
+    function weightedPick(items) {
+      const totalWeight = items.reduce((sum, item) => sum + item.need, 0);
+      let random = Math.random() * totalWeight;
+
+      for (const item of items) {
+        random -= item.need;
+        if (random <= 0) {
+          return item;
+        }
+      }
+
+      return items[items.length - 1];
+    }
+
+    function getRandomPoolName() {
+      if (pool.length === 0) return '';
+      const index = Math.floor(Math.random() * pool.length);
+      return pool[index].name;
+    }
+
+    function drawSelectedPersonWithAnimation() {
+      if (pool.length === 0 || isDrawing) return;
+
+      isDrawing = true;
+      drawOverlayBtn.disabled = true;
+      pickerStatus.textContent = '';
+
+      drawAnimationBox.style.display = 'block';
+      drawAnimationBox.classList.remove('finished');
+      drawAnimationTitle.textContent = 'Udtrækker vejledt...';
+
+      const finalSelected = weightedPick(pool);
+
+      drawAnimationName.textContent = getRandomPoolName();
+
+      drawAnimationInterval = setInterval(() => {
+        drawAnimationName.textContent = getRandomPoolName();
+      }, 90);
+
+      setTimeout(() => {
+        clearInterval(drawAnimationInterval);
+        drawAnimationInterval = null;
+
+        drawnPerson = finalSelected.name;
+        drawAnimationName.textContent = finalSelected.name;
+        drawAnimationBox.classList.add('finished');
+        drawAnimationTitle.textContent = 'Vejledt fundet';
+
+        selectorCircle.textContent = finalSelected.name;
+        selectorCircle.classList.add('has-result');
+
+        isDrawing = false;
+        renderOverlayPool();
+      }, 3000);
+    }
+
+    function updateSelectorDisplay() {
+      if (drawnPerson) {
+        selectorCircle.textContent = drawnPerson;
+        selectorCircle.classList.add('has-result');
+      } else {
+        selectorCircle.textContent = 'Tryk for tilføj';
+        selectorCircle.classList.remove('has-result');
+      }
+    }
+
+    function resetPoolOnly() {
+      if (isDrawing) return;
+      pool = [];
+      selectedName = null;
+      drawnPerson = null;
+      pickerStatus.textContent = '';
+
+      drawAnimationBox.style.display = 'none';
+      drawAnimationBox.classList.remove('finished');
+      drawAnimationTitle.textContent = 'Udtrækker vejledt...';
+      drawAnimationName.textContent = '';
+
+      renderNameButtons();
+      renderOverlayPool();
+      updateSelectorDisplay();
+    }
+
+    function resetSelectionAndPool() {
+      if (isDrawing) return;
+      pool = [];
+      selectedName = null;
+      drawnPerson = null;
+      pickerStatus.textContent = '';
+
+      drawAnimationBox.style.display = 'none';
+      drawAnimationBox.classList.remove('finished');
+      drawAnimationTitle.textContent = 'Udtrækker vejledt...';
+      drawAnimationName.textContent = '';
+
+      if (drawAnimationInterval) {
+        clearInterval(drawAnimationInterval);
+        drawAnimationInterval = null;
+      }
+
+      isDrawing = false;
+      renderNameButtons();
+      renderOverlayPool();
+      updateSelectorDisplay();
+    }
+
     updateUI();
+    updateSelectorDisplay();
 
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
