@@ -32,6 +32,7 @@
       --shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
       --timer-bg: #1f2c3f;
       --circle-size: min(30vw, 126px);
+      --modal-circle-size: min(52vw, 290px);
     }
 
     html, body {
@@ -126,6 +127,14 @@
       text-align: center;
     }
 
+    .timer-subhint {
+      font-size: clamp(0.72rem, 1.8vw, 0.8rem);
+      opacity: 0.8;
+      text-align: center;
+      margin-top: -2px;
+      margin-bottom: 2px;
+    }
+
     .corner-minute {
       position: absolute;
       width: 26px;
@@ -154,8 +163,8 @@
 
     .corner-1 { top: 8px; left: 2px; }
     .corner-2 { top: 8px; right: 2px; }
-    .corner-3 { bottom: 44px; left: 2px; }
-    .corner-4 { bottom: 44px; right: 2px; }
+    .corner-3 { bottom: 6px; left: 2px; }
+    .corner-4 { bottom: 6px; right: 2px; }
 
     .pie-timer {
       width: var(--circle-size);
@@ -329,7 +338,8 @@
     }
 
     .overlay,
-    .picker-overlay {
+    .picker-overlay,
+    .timer-overlay {
       position: fixed;
       inset: 0;
       background: rgba(15, 23, 42, 0.22);
@@ -338,12 +348,13 @@
       display: none;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 16px;
       z-index: 999;
     }
 
     .overlay.show,
-    .picker-overlay.show {
+    .picker-overlay.show,
+    .timer-overlay.show {
       display: flex;
     }
 
@@ -359,12 +370,38 @@
       padding: 20px 18px 16px;
     }
 
+    .timer-modal {
+      width: min(92vw, 520px);
+      max-height: min(82dvh, 620px);
+      overflow: hidden;
+      background: #1f2c3f;
+      color: #fff;
+      border-radius: 26px;
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.32);
+      padding: 16px 16px 18px;
+      display: flex;
+      flex-direction: column;
+    }
+
     .modal-title,
-    .picker-title {
+    .picker-title,
+    .timer-modal-title {
       margin: 0 0 12px 0;
       font-size: 1.08rem;
       line-height: 1.2;
       text-align: center;
+    }
+
+    .timer-modal-title {
+      font-size: clamp(1.05rem, 3vw, 1.28rem);
+      margin-bottom: 4px;
+    }
+
+    .timer-modal-hint {
+      text-align: center;
+      font-size: 0.88rem;
+      opacity: 0.88;
+      margin-bottom: 10px;
     }
 
     .modal-text {
@@ -389,7 +426,8 @@
     }
 
     .modal-actions,
-    .picker-actions {
+    .picker-actions,
+    .timer-modal-actions {
       display: flex;
       justify-content: center;
       gap: 8px;
@@ -399,7 +437,8 @@
     .close-btn,
     .picker-btn,
     .draw-overlay-btn,
-    .remove-pool-btn {
+    .remove-pool-btn,
+    .timer-btn {
       border: none;
       border-radius: 12px;
       padding: 12px 18px;
@@ -409,6 +448,13 @@
       cursor: pointer;
       background: #111827;
       color: #fff;
+    }
+
+    .timer-btn {
+      background: #f2f2f2;
+      color: #111827;
+      min-height: 42px;
+      padding: 10px 16px;
     }
 
     .draw-overlay-btn {
@@ -588,6 +634,67 @@
       color: #166534;
     }
 
+    .timer-modal-body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      overflow: hidden;
+    }
+
+    .timer-modal-circle-wrap {
+      position: relative;
+      width: var(--modal-circle-size);
+      height: var(--modal-circle-size);
+      max-width: 100%;
+      flex: 0 0 auto;
+      margin: 4px auto 0;
+    }
+
+    .modal-corner-minute {
+      position: absolute;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.34);
+      background: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.96);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.98rem;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.18s ease;
+      z-index: 2;
+    }
+
+    .modal-corner-minute.active {
+      border-color: rgba(255,255,255,0.98);
+      box-shadow: 0 0 0 3px rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.16);
+      color: #fff;
+    }
+
+    .modal-corner-1 { top: -4px; left: -4px; }
+    .modal-corner-2 { top: -4px; right: -4px; }
+    .modal-corner-3 { bottom: -4px; left: -4px; }
+    .modal-corner-4 { bottom: -4px; right: -4px; }
+
+    .pie-timer.large {
+      width: 100%;
+      height: 100%;
+    }
+
+    .pie-timer.large .pie-center {
+      inset: 40px;
+    }
+
+    .pie-timer.large .pie-time {
+      font-size: clamp(1.5rem, 6.2vw, 2.4rem);
+    }
+
     @media (min-width: 700px) {
       .page {
         max-width: 720px;
@@ -608,6 +715,37 @@
         font-size: 0.82rem;
       }
     }
+
+    @media (max-width: 520px) {
+      .timer-modal {
+        width: min(94vw, 480px);
+        padding: 14px 12px 16px;
+      }
+
+      :root {
+        --modal-circle-size: min(58vw, 250px);
+      }
+
+      .modal-corner-minute {
+        width: 42px;
+        height: 42px;
+        font-size: 0.92rem;
+      }
+
+      .pie-timer.large .pie-center {
+        inset: 34px;
+      }
+
+      .pie-timer.large .pie-time {
+        font-size: clamp(1.3rem, 6vw, 2rem);
+      }
+
+      .timer-btn {
+        min-height: 40px;
+        font-size: 0.88rem;
+        padding: 10px 14px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -624,8 +762,9 @@
             <div class="corner-minute corner-4" onclick="event.stopPropagation(); selectMinute(4)">4</div>
 
             <div class="timer-title">Timer</div>
+            <div class="timer-subhint">Tryk på uret for stor visning</div>
 
-            <div class="pie-timer" onclick="toggleClockTimer()">
+            <div class="pie-timer" onclick="openTimerOverlay()">
               <svg viewBox="0 0 200 200" aria-hidden="true">
                 <circle class="pie-bg" cx="100" cy="100" r="92"></circle>
                 <path id="pieSlice" class="pie-slice" d=""></path>
@@ -774,6 +913,44 @@
     </div>
   </div>
 
+  <div id="timerOverlay" class="timer-overlay" onclick="closeTimerOverlay()">
+    <div class="timer-modal" onclick="event.stopPropagation()">
+      <h3 class="timer-modal-title">Timer</h3>
+      <div class="timer-modal-hint">Tryk på uret for start / pause</div>
+
+      <div class="timer-modal-body">
+        <div class="timer-modal-circle-wrap">
+          <div class="modal-corner-minute modal-corner-1 active" onclick="event.stopPropagation(); selectMinute(1)">1</div>
+          <div class="modal-corner-minute modal-corner-2" onclick="event.stopPropagation(); selectMinute(2)">2</div>
+          <div class="modal-corner-minute modal-corner-3" onclick="event.stopPropagation(); selectMinute(3)">3</div>
+          <div class="modal-corner-minute modal-corner-4" onclick="event.stopPropagation(); selectMinute(4)">4</div>
+
+          <div class="pie-timer large" onclick="toggleClockTimer()">
+            <svg viewBox="0 0 200 200" aria-hidden="true">
+              <circle class="pie-bg" cx="100" cy="100" r="92"></circle>
+              <path id="pieSliceModal" class="pie-slice" d=""></path>
+            </svg>
+            <div class="pie-center">
+              <div id="pieTimeModal" class="pie-time">01:00</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="timer-modal-actions">
+          <button class="timer-btn" onclick="toggleClockTimer()">
+            Start / pause
+          </button>
+          <button class="timer-btn" onclick="resetTimer()">
+            Nulstil
+          </button>
+          <button class="timer-btn" onclick="closeTimerOverlay()">
+            Luk
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     let audioCtx = null;
 
@@ -836,6 +1013,8 @@
 
     const pieSlice = document.getElementById('pieSlice');
     const pieTime = document.getElementById('pieTime');
+    const pieSliceModal = document.getElementById('pieSliceModal');
+    const pieTimeModal = document.getElementById('pieTimeModal');
 
     function formatTime(seconds) {
       const min = Math.floor(seconds / 60);
@@ -879,20 +1058,44 @@
       ].join(' ');
     }
 
-    function updatePie() {
-      const fraction = remainingSeconds / totalSeconds;
-      pieSlice.setAttribute('d', describePieSlice(100, 100, 92, fraction));
+    function updateSinglePie(pathEl, fraction) {
+      pathEl.setAttribute('d', describePieSlice(100, 100, 92, fraction));
 
       if (remainingSeconds <= 20 && remainingSeconds > 0) {
-        pieSlice.classList.add('warning');
+        pathEl.classList.add('warning');
       } else {
-        pieSlice.classList.remove('warning');
+        pathEl.classList.remove('warning');
       }
     }
 
+    function updatePie() {
+      const fraction = remainingSeconds / totalSeconds;
+      updateSinglePie(pieSlice, fraction);
+      updateSinglePie(pieSliceModal, fraction);
+    }
+
+    function updateMinuteButtons() {
+      const activeMinute = totalSeconds / 60;
+
+      document.querySelectorAll('.corner-minute, .modal-corner-minute').forEach(el => {
+        el.classList.remove('active');
+      });
+
+      document.querySelectorAll('.corner-' + activeMinute).forEach(el => {
+        el.classList.add('active');
+      });
+
+      document.querySelectorAll('.modal-corner-' + activeMinute).forEach(el => {
+        el.classList.add('active');
+      });
+    }
+
     function updateUI() {
-      pieTime.textContent = formatTime(remainingSeconds);
+      const timeText = formatTime(remainingSeconds);
+      pieTime.textContent = timeText;
+      pieTimeModal.textContent = timeText;
       updatePie();
+      updateMinuteButtons();
     }
 
     function selectMinute(minuteValue) {
@@ -905,13 +1108,6 @@
       totalSeconds = minuteValue * 60;
       remainingSeconds = totalSeconds;
       warningBeepPlayed = false;
-
-      document.querySelectorAll('.corner-minute').forEach(el => {
-        el.classList.remove('active');
-      });
-
-      const activeEl = document.querySelector('.corner-' + minuteValue);
-      if (activeEl) activeEl.classList.add('active');
 
       updateUI();
     }
@@ -984,6 +1180,17 @@
 
     function closeOverlay() {
       document.getElementById('overlay').classList.remove('show');
+      document.getElementById('page').classList.remove('blurred');
+    }
+
+    function openTimerOverlay() {
+      document.getElementById('timerOverlay').classList.add('show');
+      document.getElementById('page').classList.add('blurred');
+      updateUI();
+    }
+
+    function closeTimerOverlay() {
+      document.getElementById('timerOverlay').classList.remove('show');
       document.getElementById('page').classList.remove('blurred');
     }
 
